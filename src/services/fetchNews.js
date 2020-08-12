@@ -2,13 +2,10 @@ var fetch = require('node-fetch');
 var config = require('../config.js');
 
 module.exports.fetchNewsByKeyword = async function fetchNewsByKeyword(keyword) {
-
 	var url = new URL("https://gnews.io/api/v3/search"),
-    params = {
-    	q: keyword,
-    	max: config.gnews.limit,
-    	token: config.gnews.token,
-    };
+    params = config.gnews.params;
+
+    params.q = keyword;
     Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
 
 	return await fetch(url)
@@ -21,10 +18,8 @@ module.exports.fetchNewsByKeyword = async function fetchNewsByKeyword(keyword) {
 module.exports.fetchTopNews = async function fetchTopNews() {
 
 	var url = new URL("https://gnews.io/api/v3/top-news"),
-    params = {
-    	max: config.gnews.limit,
-    	token: config.gnews.token,
-    };
+    params = config.gnews.params;
+
     Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
 
 	return await fetch(url)
