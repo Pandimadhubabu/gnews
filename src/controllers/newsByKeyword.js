@@ -8,7 +8,7 @@ async function newsByKeyword(req, res) {
 	const uri = config.mongodb.uri;
 	const client = new MongoClient(uri, { useUnifiedTopology: true });
 
-	const keyword = req.params.keyword;
+	const keyword = req.params.keyword.toLowerCase();
 	try {
 		await client.connect();
 		const db = client.db(config.mongodb.db);
