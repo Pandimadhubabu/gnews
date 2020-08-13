@@ -14,7 +14,7 @@ app.use(cors());
 app.use(helmet());
 
 //invoke update on initialization
-// cronJob();
+cronJob();
 
 // Schedule update every hour
 schedule.scheduleJob('0 * * * *', function(){
