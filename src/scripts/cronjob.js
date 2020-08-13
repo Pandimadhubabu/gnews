@@ -161,7 +161,7 @@ async function handleOperation(term, collection, input) {
 		console.log(data);
 	}
 
-	await new Promise(resolve => setTimeout(resolve, 100));
+	await new Promise(resolve => setTimeout(resolve, 500));
 }
 
 //prune stale collections after maybe 7 days??
