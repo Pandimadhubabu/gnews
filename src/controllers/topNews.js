@@ -1,8 +1,8 @@
 var { MongoClient } = require("mongodb");
-var { checkNewsExists, getNews, addNews } = require('../services/mongoBasicOps.js');
+var { getArticles, addArticles } = require('../services/mongoBasicOps.js');
 var { fetchNews } = require('../services/fetchNews.js');
 var mongoConfig = require('../config.js').mongodb;
-
+var gnewsConfig = require('../config.js').gnews;
 
 async function topNews(req, res) {
 	const uri = mongoConfig.topnewsDB.uri;
@@ -13,22 +13,26 @@ async function topNews(req, res) {
 		const db = client.db(mongoConfig.topnewsDB.name);
 		const collection = db.collection("top-news");
 
-		const newsExists = await checkNewsExists(collection);
-		if(newsExists) {
-			console.log("news exists!");
-			var ret = {};
-			const news = await getNews(collection);
-			ret.articles = news;
-			res.json(ret);
-		} else {
-			//deprecated after cron job
-			console.log("news does not exist yet");
-		    var data = await fetchNews("top-news", req.query);
+		var articles = await getArticles(collection);
+		if(articles.length == 0) {
+			console.log("News does not exist yet");
 
-		    var writeResult = await addNews(collection, data.articles);
-	    	console.log("added to mongo!");
-		    res.json(data);
+			var input = { type: "top-news" };
+		    var data = await fetchNews(input);
+		    if(!data.errors) {
+				var writeResult = await addArticles(collection, data.articles, true);
+				console.log("added to mongo!");
+				articles = data.articles;
+			} else {
+				console.log("Request limit reached");
+				res.json({ message: "Request limit reached", data: data });
+			}
 		}
+
+		var ret = {};
+		var max = (req.query.max) ? req.query.max : gnewsConfig.default_max;
+		ret.articles = articles.slice(0, max);
+		res.json(ret);
 
 	} finally {
 		client.close();

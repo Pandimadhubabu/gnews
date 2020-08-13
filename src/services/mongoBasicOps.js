@@ -1,44 +1,58 @@
-module.exports.checkNewsExists = async function checkNewsExists(collection, callback) {
-	const numOfDocs = await collection.countDocuments({});
-	return numOfDocs != 0;
-};
+var { isKeyWord } = require('../utilities/articleUtils.js');
 
-module.exports.getNews = async function getNews(collection, callback) {
-	var news = await collection.find().toArray();
-	var newsArray = [];
-	for(var i = 0; i < news.length; i++) {
-		if(!news[i]['_date-added']) {
-			newsArray.push(news[i]);
-		}
-	}
+
+async function getArticles(collection, callback) {
+    var articlesArray = [];
+    var articles = await collection.findOne({ articles: { $exists:true } });
     console.log("retrieved documents");
-	return newsArray;
+    if(articles) {
+        articles.articles.forEach((e) => articlesArray.push(e));
+    }
+    return articlesArray;
 };
 
-module.exports.addNews = async function addNews(collection, entries, callback) {
+async function addArticles(collection, entries, updateDate, callback) {
+    //sort by publish date to ensure ordered insertion into mongodb
+    entries = entries.sort((a, b) => a.publishedAt < b.publishedAt ? 1 : -1);
 
     // Get the collection and bulk api artefacts
     var bulkUpdateOps = [];    
-    entries.forEach(function(doc) {
-        bulkUpdateOps.push({ "insertOne": { "document": doc } });
-    });
 
-    //insert current date
-    bulkUpdateOps.push({"insertOne": {"document": {
-                    "_date-added": new Date(Date.now()).toISOString(),
-	} } });
+    //push or update articles
+    bulkUpdateOps.push(
+        { updateOne: 
+            {
+                "filter": { articles: { $exists: true } },
+                "update": { $set: { articles: entries } },
+                "upsert": true,
+            }
+        }
+    );
 
+    //if need to update date, do it
+    //should point to true -> first time inserting, word in keyword.json
+    if(updateDate) {
+        bulkUpdateOps.push(
+            { updateOne: 
+                {
+                    "filter": { date_added: { $exists: true } },
+                    "update": { $set: { date_added: new Date(Date.now()).toISOString() } },
+                    "upsert": true,
+                }
+            }
+        );
+    }
+
+    // bulk write to mongodb
     if (bulkUpdateOps.length > 0) {
         await collection.bulkWrite(bulkUpdateOps).then(function(r) {
             // do something with result
-            console.log(`Successfully wrote ${bulkUpdateOps.length} entries!`);
+            console.log(`Successfully wrote ${entries.length} entries!`);
         });
     }
-
-    return bulkUpdateOps;
 };
 
-module.exports.getAllNews = async function getAllNews(db, callback) {
+async function getAllCollections(db, callback) {
     var collectionList = await db.listCollections().toArray();
 
     //map collections to their names
@@ -46,9 +60,24 @@ module.exports.getAllNews = async function getAllNews(db, callback) {
     return new Set(collectionList);
 };
 
-module.exports.dropCollection = async function dropCollection(collection, callback) {
-    await collection.deleteMany({});
+
+async function dropCollection(collection, callback) {
+    await collection.drop();
+}
+
+async function getCollectionAddDate(collection, callback) {
+    var addDate = await collection.findOne({ "date_added": { $exists : true }});
+    if(addDate) return addDate['date_added'];
+    else return null;
 };
+
+
+module.exports.getArticles = getArticles;
+module.exports.addArticles = addArticles;
+module.exports.getAllCollections = getAllCollections;
+module.exports.dropCollection = dropCollection;
+module.exports.getCollectionAddDate = getCollectionAddDate;
+
 
 
 

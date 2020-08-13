@@ -1,11 +1,28 @@
 var { MongoClient } = require("mongodb");
 var mongoConfig = require('../config.js').mongodb;
-var cronConfig = require('../config.js').cron;
 
 var { fetchNews } = require('../services/fetchNews.js');
-var { getAllNews, dropCollection, addNews } = require('../services/mongoBasicOps.js');
+var { addArticles, getAllCollections, dropCollection, getCollectionAddDate } = require('../services/mongoBasicOps.js');
+var { staleISOString } = require('../utilities/timeUtils.js');
+
 var json = require('../data/keywords.json');
 
+/**
+
+
+	Option for reading during writes
+	-> write collection to backup db and then replace
+	-> delete backup collection
+
+	->on insert, append index using increment
+	->on cronjob, update each article according to index, 
+		add to index or remove docs if necessary
+
+	->use schema for collection"
+		articles: [].
+		date_added: 
+
+**/
 
 async function cronJob() {
 	/****************************TOP NEWS****************************/
@@ -18,9 +35,10 @@ async function cronJob() {
 	await handleSearch();
 }
 
+module.exports.cronJob = cronJob;
+
+
 async function handleTopNews() {
-
-
 	console.log("*****************STARTING TOP NEWS*****************\n");
 
 	//mongo client setup
@@ -39,16 +57,17 @@ async function handleTopNews() {
 		//set collection
 		let collection = db.collection(collName);
 
-		//drop collection
-		await dropCollection(collection);
-		console.log("dropped top-news DB collection: ", collName);
-
 		//fetch from gnews and update mongodb with new articles
-		var params = cronConfig.params;
-		var data = await fetchNews("top-news", params);
-	    await addNews(collection, data.articles);
-		console.log(`added documents to collection ${collName} in mongo!`);
+		var input = { type: "top-news" };
+		var data = await fetchNews(input);
 
+		//drop collection
+		if(!data.errors) {
+		    await addArticles(collection, data.articles, true);
+			console.log(`added documents to collection ${collName} in mongo!`);
+		} else {
+			console.log("Request limit reached");
+		}
 	} finally {
 		client.close();
 	}
@@ -56,11 +75,12 @@ async function handleTopNews() {
 	console.log("*****************DONE WITH TOP NEWS*****************\n");
 }
 
+module.exports.handleTopNews = handleTopNews;
+
 
 async function handleTopics() {
 
 	console.log("*****************STARTING TOPICS*****************");
-
 	//mongo client setup
 	const uri = mongoConfig.topicsDB.uri;
 	const client = new MongoClient(uri, { useUnifiedTopology: true });
@@ -81,15 +101,16 @@ async function handleTopics() {
 			//set collection
 			let collection = db.collection(topic);
 
-			//drop collection
-			await dropCollection(collection);
-			console.log("dropped topics DB collection: ", topic);
-
 			//fetch from gnews and update mongodb with new articles
-			var params = cronConfig.params;
-			var data = await fetchNews("topic", params, topic);
-		    await addNews(collection, data.articles);
-	    	console.log(`added documents to collection ${topic} in mongo!`);
+			var input = { type: "topic", topic: topic };
+			var data = await fetchNews(input);
+
+			if(!data.errors) {
+				//add fetch data to mongodb
+				await addArticles(collection, data.articles, true);
+				console.log(`added documents to collection ${topic} in mongo!`);
+
+			}
 	    	console.log("***********");
 	    	console.log('\n');
 		}
@@ -99,65 +120,59 @@ async function handleTopics() {
 	console.log("*****************DONE WITH TOPICS*****************\n");
 }
 
+module.exports.handleTopics = handleTopics;
+
 	
 //get names of all collections in form of set, when iterating through collection, delete from set
 async function handleSearch() {
 	console.log("*****************STARTING SEARCH*****************\n");
-
 
 	//mongo client setup
 	const uri = mongoConfig.searchDB.uri;
 	const client = new MongoClient(uri, { useUnifiedTopology: true });
 
 	try {
-
 		await client.connect();
 		const db = client.db(mongoConfig.searchDB.name);
 
-		var dbCollectionSet = await getAllNews(db);
+		//dbCollectionSet will hold all keywords that exist inside mongo database
+		var dbCollectionSet = await getAllCollections(db);
 
 		// //iterate through list of topics
-		// var search = json['search'];
-		// for(var key in search) {
-		// 	console.log("***********");
+		var search = json['search'];
+		for(var key in search) {
+			console.log("***********");
 
-		// 	//get topics term
-		// 	searchTerm = search[key].term;
+			//get keyword
+			keyword = search[key].term.trim().toLowerCase();
 
-		// 	//set collection
-		// 	let collection = db.collection(searchTerm);
+			//set collection
+			let collection = db.collection(keyword);
 
-		// 	//drop collection
-		// 	await dropCollection(collection);
-		// 	console.log("dropped topics DB collection: ", searchTerm);
+			//fetch from gnews and update mongodb with new articles
+			var input = { type: "search", keyword: keyword };
+			var data = await fetchNews(input);
 
-		// 	//fetch from gnews and update mongodb with new articles
-		// 	var params = cronConfig.params;
-		// 	params.q = searchTerm.toLowerCase();
+			//if no errors on fetch call -> eg if request limit not reached
+			if(!data.errors) {
+				//add fetch data to mongodb
+				await addArticles(collection, data.articles, true);
+				console.log(`added documents to collection ${keyword} in mongo!`);
 
-		// 	var data = await fetchNews("search", params);
-		//     await addNews(collection, data.articles);
+			}
 
-		//     //if our Search database has a required search term, remove it
-		//     //we'll process leftovers later, where leftovers are non-required search terms
-		//     dbCollectionSet.delete(searchTerm);
+		    //if our Search database has a required keywords, remove it
+		    //we'll process leftovers later, where leftovers are non-required keywords
+		    dbCollectionSet.delete(keyword);
 
-	 //    	console.log(`added documents to collection ${searchTerm} in mongo!`);
-	 //    	console.log("***********");
-	 //    	console.log('\n');
-		// }
+	    	console.log("***********");
+	    	console.log('\n');
+		}
 
+		// process non important keywords here
+		// dbCollectionSet now contains all non-keywords that exist inside mongo database
 
-		//process search terms here
-		// console.log(dbCollectionSet);
-
-		dbCollectionSet.forEach(term => {
-			console.log(term);
-
-
-
-
-		});
+		await handleStaleSearch(db, dbCollectionSet);
 
 	} finally {
 		client.close();
@@ -166,23 +181,37 @@ async function handleSearch() {
 	console.log("*****************DONE WITH SEARCH*****************\n");
 }
 
+module.exports.handleSearch = handleSearch;
+
 
 //prune stale collections after maybe 7 days??
 async function handleStaleSearch(db, set) {
 	//iterate over set
 	//get collection information,
 	//	-if date-added exceeds 7 days, mark as stale and remove otherwise leave it alone
+
+	for(term of set) {
+		var collection = db.collection(term);
+		var addDateISO = await getCollectionAddDate(collection);
+
+		//check whether collection is stale
+		if(staleISOString(addDateISO, mongoConfig.staleDays)) {
+
+			//drop the collection if stale
+			console.log(`Dropping collection ${term}...`);
+			await dropCollection(collection);
+		} else {
+
+			//update with fetch, don't update date_added
+			var input = { type: "search", keyword: term };
+			const data = await fetchNews(input);
+			console.log(`${term} is not stale enough yet...`);
+			await addArticles(collection, data.articles, false);
+		}
+	}
 }
 
-
-handleSearch();
-
-
-
-
-
-
-
+// cronJob();
 
 
 
