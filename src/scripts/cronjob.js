@@ -7,23 +7,6 @@ var { staleISOString } = require('../utilities/timeUtils.js');
 
 var json = require('../data/keywords.json');
 
-/**
-
-
-	Option for reading during writes
-	-> write collection to backup db and then replace
-	-> delete backup collection
-
-	->on insert, append index using increment
-	->on cronjob, update each article according to index, 
-		add to index or remove docs if necessary
-
-	->use schema for collection"
-		articles: [].
-		date_added: 
-
-**/
-
 async function cronJob() {
 	/****************************TOP NEWS****************************/
 	await handleTopNews();
@@ -57,17 +40,10 @@ async function handleTopNews() {
 		//set collection
 		let collection = db.collection(collName);
 
-		//fetch from gnews and update mongodb with new articles
+		//pass to handler function for fetching and adding news
 		var input = { type: "top-news" };
-		var data = await fetchNews(input);
-
-		//drop collection
-		if(!data.errors) {
-		    await addArticles(collection, data.articles, true);
-			console.log(`added documents to collection ${collName} in mongo!`);
-		} else {
-			console.log("Request limit reached");
-		}
+		await handleOperation(collection, input);
+		
 	} finally {
 		client.close();
 	}
@@ -101,16 +77,10 @@ async function handleTopics() {
 			//set collection
 			let collection = db.collection(topic);
 
-			//fetch from gnews and update mongodb with new articles
+			//pass to handler function for fetching and adding news
 			var input = { type: "topic", topic: topic };
-			var data = await fetchNews(input);
+			await handleOperation(collection, input);
 
-			if(!data.errors) {
-				//add fetch data to mongodb
-				await addArticles(collection, data.articles, true);
-				console.log(`added documents to collection ${topic} in mongo!`);
-
-			}
 	    	console.log("***********");
 	    	console.log('\n');
 		}
@@ -149,17 +119,9 @@ async function handleSearch() {
 			//set collection
 			let collection = db.collection(keyword);
 
-			//fetch from gnews and update mongodb with new articles
+			//pass to handler function for fetching and adding news
 			var input = { type: "search", keyword: keyword };
-			var data = await fetchNews(input);
-
-			//if no errors on fetch call -> eg if request limit not reached
-			if(!data.errors) {
-				//add fetch data to mongodb
-				await addArticles(collection, data.articles, true);
-				console.log(`added documents to collection ${keyword} in mongo!`);
-
-			}
+			await handleOperation(collection, input);
 
 		    //if our Search database has a required keywords, remove it
 		    //we'll process leftovers later, where leftovers are non-required keywords
@@ -183,6 +145,19 @@ async function handleSearch() {
 
 module.exports.handleSearch = handleSearch;
 
+
+async function handleOperation(collection, input) {
+
+	//fetch from gnews and update mongodb with new articles
+	var data = await fetchNews(input);
+	//if no errors on fetch call -> eg if request limit not reached
+	if(!data.errors) {
+		//add fetch data to mongodb
+		await addArticles(collection, data.articles, true);
+		console.log(`added articles to collection in mongo!`);
+
+	}
+}
 
 //prune stale collections after maybe 7 days??
 async function handleStaleSearch(db, set) {
@@ -210,8 +185,6 @@ async function handleStaleSearch(db, set) {
 		}
 	}
 }
-
-// cronJob();
 
 
 

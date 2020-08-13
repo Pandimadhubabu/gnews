@@ -4,7 +4,13 @@
 	],
 	"topics": [
 		{ "term": "world" },
-		{ "term": "nation" }
+		{ "term": "nation" },
+		{ "term": "business" },
+		{ "term": "technology" },
+		{ "term": "entertainment" },
+		{ "term": "sports" },
+		{ "term": "science" },
+		{ "term": "health" }
 	],
 	"search": [
 			{ "term": "latest" },
