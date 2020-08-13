@@ -7,6 +7,7 @@ var mongoConfig = require('../config.js').mongodb;
 async function searchTopic(req, res) {
 	const uri = mongoConfig.topicsDB.uri;
 	const client = new MongoClient(uri, { useUnifiedTopology: true });
+	
 	//must lowercase here since using term to access coll in mongo
 	var topic = req.params.topic.toLowerCase();
 	var params = req.query;

@@ -1,8 +1,8 @@
 {
-	"top-news": [
-		{ "term": "top-news" }
+	"top-news": [ //10
+		{ "term": "top-news", "limit": 10}
 	],
-	"topics": [
+	"topics": [ //20
 		{ "term": "world" },
 		{ "term": "nation" },
 		{ "term": "business" },
@@ -12,10 +12,10 @@
 		{ "term": "science" },
 		{ "term": "health" }
 	],
-	"search": [
-			{ "term": "latest" },
+	"keywords": [
+			{ "term": "latest" , ""},
 			{ "term": "recent news" },
-			{ "term": "news" },
+			{ "term": "news", "limit": 10},
 			{ "term": "coronavirus" },
 			{ "term": "environmental change" },
 			{ "term": "health" },
@@ -90,3 +90,6 @@
 			{ "term": "suny plattsburgh" } 
 	]
 } 
+
+topnews 10
+news 10

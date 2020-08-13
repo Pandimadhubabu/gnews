@@ -2,8 +2,10 @@ var express = require('express');
 var express = require('express');
 var cron = require('node-cron');
 const routes = require('./routes.js');
+var cors = require('cors');
 //mongo setup
 var app = express();
+app.use(cors());
 
 //scheduler
 // cron.schedule('* */1 * * * *', () => {
