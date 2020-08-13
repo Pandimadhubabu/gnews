@@ -13,6 +13,7 @@ async function getArticles(collection, callback) {
 
 async function addArticles(collection, entries, updateDate, callback) {
     //sort by publish date to ensure ordered insertion into mongodb
+    if(!entries) console.log("WHAT");
     entries = entries.sort((a, b) => a.publishedAt < b.publishedAt ? 1 : -1);
 
     // Get the collection and bulk api artefacts
