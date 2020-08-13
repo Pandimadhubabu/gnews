@@ -42,7 +42,7 @@ async function handleTopNews() {
 
 		//pass to handler function for fetching and adding news
 		var input = { type: "top-news" };
-		await handleOperation(colName, collection, input);
+		await handleOperation(collName, collection, input);
 		
 	} finally {
 		client.close();

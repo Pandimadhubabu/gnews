@@ -24,8 +24,8 @@ async function topNews(req, res) {
 				console.log("added to mongo!");
 				articles = data.articles;
 			} else {
-				console.log("Request limit reached");
-				res.json({ message: "Request limit reached", data: data });
+				console.log("Errored out");
+				res.json({ message: "Errored out", errors: data.errors });
 			}
 		}
 
