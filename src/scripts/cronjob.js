@@ -42,7 +42,7 @@ async function handleTopNews() {
 
 		//pass to handler function for fetching and adding news
 		var input = { type: "top-news" };
-		await handleOperation(collection, input);
+		await handleOperation(colName, collection, input);
 		
 	} finally {
 		client.close();
@@ -79,7 +79,7 @@ async function handleTopics() {
 
 			//pass to handler function for fetching and adding news
 			var input = { type: "topic", topic: topic };
-			await handleOperation(collection, input);
+			await handleOperation(topic, collection, input);
 
 	    	console.log("***********");
 	    	console.log('\n');
@@ -121,7 +121,7 @@ async function handleSearch() {
 
 			//pass to handler function for fetching and adding news
 			var input = { type: "search", keyword: keyword };
-			await handleOperation(collection, input);
+			await handleOperation(keyword, collection, input);
 
 		    //if our Search database has a required keywords, remove it
 		    //we'll process leftovers later, where leftovers are non-required keywords
@@ -146,7 +146,7 @@ async function handleSearch() {
 module.exports.handleSearch = handleSearch;
 
 
-async function handleOperation(collection, input) {
+async function handleOperation(term, collection, input) {
 
 	//fetch from gnews and update mongodb with new articles
 	var data = await fetchNews(input);
@@ -156,6 +156,9 @@ async function handleOperation(collection, input) {
 		await addArticles(collection, data.articles, true);
 		console.log(`added articles to collection in mongo!`);
 
+	} else {
+		console.log("DIDN'T WORK FOR", term);
+		console.log(data);
 	}
 
 	await new Promise(resolve => setTimeout(resolve, 100));
@@ -183,7 +186,7 @@ async function handleStaleSearch(db, set) {
 			var input = { type: "search", keyword: term };
 			const data = await fetchNews(input);
 			console.log(`${term} is not stale enough yet...`);
-			if(data.articles) await addArticles(collection, data.articles, false);
+			if(!data.errors) await addArticles(collection, data.articles, false);
 			else {
 				console.log("DIDN'T WORK FOR", term);
 				console.log(data);
