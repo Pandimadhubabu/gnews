@@ -3,14 +3,7 @@
 		{ "term": "top-news" }
 	],
 	"topics": [
-		{ "term": "world" },
-		{ "term": "nation" },
-		{ "term": "business" },
-		{ "term": "technology" },
-		{ "term": "entertainment" },
-		{ "term": "sports" },
-		{ "term": "science" },
-		{ "term": "health" }
+		{ "term": "world" }
 	],
 	"search": [
 			{ "term": "latest" },

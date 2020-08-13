@@ -153,6 +153,7 @@ async function handleOperation(collection, input) {
 	//if no errors on fetch call -> eg if request limit not reached
 	if(!data.errors) {
 		//add fetch data to mongodb
+		console.log("DATA:", data);
 		await addArticles(collection, data.articles, true);
 		console.log(`added articles to collection in mongo!`);
 
