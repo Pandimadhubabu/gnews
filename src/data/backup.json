@@ -1,8 +1,8 @@
 {
-	"top-news": [ //10
-		{ "term": "top-news", "limit": 10}
+	"top-news": [
+		{ "term": "top-news"}
 	],
-	"topics": [ //20
+	"topics": [
 		{ "term": "world" },
 		{ "term": "nation" },
 		{ "term": "business" },
@@ -15,7 +15,7 @@
 	"keywords": [
 			{ "term": "latest" , ""},
 			{ "term": "recent news" },
-			{ "term": "news", "limit": 10},
+			{ "term": "news"},
 			{ "term": "coronavirus" },
 			{ "term": "environmental change" },
 			{ "term": "health" },
