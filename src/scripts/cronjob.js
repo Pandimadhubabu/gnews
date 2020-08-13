@@ -157,6 +157,8 @@ async function handleOperation(collection, input) {
 		console.log(`added articles to collection in mongo!`);
 
 	}
+
+	await new Promise(resolve => setTimeout(resolve, 100));
 }
 
 //prune stale collections after maybe 7 days??
@@ -187,6 +189,8 @@ async function handleStaleSearch(db, set) {
 				console.log(data);
 			}
 		}
+
+		await new Promise(resolve => setTimeout(resolve, 100));
 	}
 }
 
