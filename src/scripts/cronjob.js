@@ -115,7 +115,7 @@ async function handleSearch() {
 
 			//get keyword
 			keyword = search[key].term.trim().toLowerCase();
-
+			console.log(keyword);
 			//set collection
 			let collection = db.collection(keyword);
 

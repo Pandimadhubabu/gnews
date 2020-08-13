@@ -12,7 +12,7 @@
 		{ "term": "science" },
 		{ "term": "health" }
 	],
-	"keywords": [
+	"search": [
 			{ "term": "latest" , ""},
 			{ "term": "recent news" },
 			{ "term": "news"},
