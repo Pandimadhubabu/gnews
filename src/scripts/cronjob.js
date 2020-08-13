@@ -181,7 +181,8 @@ async function handleStaleSearch(db, set) {
 			var input = { type: "search", keyword: term };
 			const data = await fetchNews(input);
 			console.log(`${term} is not stale enough yet...`);
-			await addArticles(collection, data.articles, false);
+			if(data) await addArticles(collection, data.articles, false);
+			else console.log("DIDN'T WORK FOR", term)
 		}
 	}
 }
