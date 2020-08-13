@@ -1,0 +1,23 @@
+{
+	"top-news": [
+		{ "term": "top-news" }
+	],
+	"topics": [
+		{ "term": "world" },
+		{ "term": "nation" },
+		{ "term": "business" },
+		{ "term": "technology" },
+		{ "term": "entertainment" },
+		{ "term": "sports" },
+		{ "term": "science" },
+		{ "term": "health" }
+	],
+	"search": [
+			{ "term": "latest" },
+			{ "term": "recent news" },
+			{ "term": "news" },
+			{ "term": "coronavirus" },
+			{ "term": "environmental change" },
+			{ "term": "health" }
+	]
+} 

@@ -1,7 +1,6 @@
 module.exports.checkNewsExists = async function checkNewsExists(collection, callback) {
 	const numOfDocs = await collection.countDocuments({});
 	return numOfDocs != 0;
-
 };
 
 module.exports.getNews = async function getNews(collection, callback) {
@@ -12,7 +11,7 @@ module.exports.getNews = async function getNews(collection, callback) {
 			newsArray.push(news[i]);
 		}
 	}
-    console.log("retrivied documents");
+    console.log("retrieved documents");
 	return newsArray;
 };
 
@@ -38,3 +37,29 @@ module.exports.addNews = async function addNews(collection, entries, callback) {
 
     return bulkUpdateOps;
 };
+
+module.exports.getAllNews = async function getAllNews(db, callback) {
+    var collectionList = await db.listCollections().toArray();
+
+    //map collections to their names
+    collectionList = collectionList.map(e => e.name);
+    return new Set(collectionList);
+};
+
+module.exports.dropCollection = async function dropCollection(collection, callback) {
+    await collection.deleteMany({});
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+

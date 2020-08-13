@@ -2,7 +2,6 @@ var express = require('express');
 var express = require('express');
 var cron = require('node-cron');
 const routes = require('./routes.js');
-var { updateNews } = require('./services/updateNews/updateNews.js');
 //mongo setup
 var app = express();
 

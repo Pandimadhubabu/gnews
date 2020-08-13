@@ -4,14 +4,18 @@ var { fetchNews } = require('../services/fetchNews.js');
 var mongoConfig = require('../config.js').mongodb;
 
 
-async function topNews(req, res) {
-	const uri = mongoConfig.topnewsDB.uri;
+async function searchTopic(req, res) {
+	const uri = mongoConfig.topicsDB.uri;
 	const client = new MongoClient(uri, { useUnifiedTopology: true });
+	//must lowercase here since using term to access coll in mongo
+	var topic = req.params.topic.toLowerCase();
+	var params = req.query;
 
+	// const keyword = req.params.keyword.toLowerCase();
 	try {
 		await client.connect();
-		const db = client.db(mongoConfig.topnewsDB.name);
-		const collection = db.collection("top-news");
+		const db = client.db(mongoConfig.topicsDB.name);
+		const collection = db.collection(topic);
 
 		const newsExists = await checkNewsExists(collection);
 		if(newsExists) {
@@ -23,8 +27,8 @@ async function topNews(req, res) {
 		} else {
 			//deprecated after cron job
 			console.log("news does not exist yet");
-		    var data = await fetchNews("top-news", req.query);
 
+			var data = await fetchNews("topic", params, topic);
 		    var writeResult = await addNews(collection, data.articles);
 	    	console.log("added to mongo!");
 		    res.json(data);
@@ -35,4 +39,4 @@ async function topNews(req, res) {
 	}
 }
 
-module.exports = { topNews };
+module.exports = { searchTopic };
