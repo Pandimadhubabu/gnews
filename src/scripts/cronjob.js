@@ -180,7 +180,6 @@ async function handleStaleSearch(db, set) {
 			//update with fetch, don't update date_added
 			var input = { type: "search", keyword: term };
 			const data = await fetchNews(input);
-			console.log("DATA:", data);
 			console.log(`${term} is not stale enough yet...`);
 			await addArticles(collection, data.articles, false);
 		}

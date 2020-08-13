@@ -1,8 +1,10 @@
+require('heroku-self-ping').default("https://upwork-gnews-app.herokuapp.com");
 var express = require('express');
 var cron = require('node-cron');
 var schedule = require('node-schedule');
 var cors = require('cors');
 var helmet = require('helmet');
+
 const routes = require('./routes.js');
 var { cronJob, handleTopNews } = require('./scripts/cronjob.js');
 
