@@ -22,18 +22,21 @@ async function searchNews(req, res) {
 
 			var input = { type: "search", keyword: keyword };
 		    var data = await fetchNews(input);
-		    
+
 		    if(!data.errors) {
 				var writeResult = await addArticles(collection, data.articles, true);
 				console.log("added to mongo!");
 				articles = data.articles;
 			} else {
-				console.log("Request limit reached");
-				res.json({ message: "Request limit reached", data: data });
+				console.log("Errored out");
+				res.json({ message: "Errored out", error: data.errors });
 			}
 		}
 
 		var ret = {};
+		if(req.query.image && req.query.image.toLowerCase() == 'required') {
+			articles = articles.filter(e => e.image != null);
+		}
 		var max = (req.query.max) ? req.query.max : gnewsConfig.default_max;
 		ret.articles = articles.slice(0, max);
 		res.json(ret);

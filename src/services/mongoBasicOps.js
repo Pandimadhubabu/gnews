@@ -9,7 +9,7 @@ async function getArticles(collection, callback) {
         articles.articles.forEach((e) => articlesArray.push(e));
     }
     return articlesArray;
-};
+}
 
 async function addArticles(collection, entries, updateDate, callback) {
     //sort by publish date to ensure ordered insertion into mongodb
@@ -45,13 +45,11 @@ async function addArticles(collection, entries, updateDate, callback) {
     }
 
     // bulk write to mongodb
-    if (bulkUpdateOps.length > 0) {
-        await collection.bulkWrite(bulkUpdateOps).then(function(r) {
-            // do something with result
-            console.log(`Successfully wrote ${entries.length} entries!`);
-        });
-    }
-};
+    await collection.bulkWrite(bulkUpdateOps).then(function(r) {
+        // do something with result
+        console.log(`Successfully wrote ${entries.length + 1} entries!`);
+    });
+}
 
 async function getAllCollections(db, callback) {
     var collectionList = await db.listCollections().toArray();
@@ -59,7 +57,7 @@ async function getAllCollections(db, callback) {
     //map collections to their names
     collectionList = collectionList.map(e => e.name);
     return new Set(collectionList);
-};
+}
 
 
 async function dropCollection(collection, callback) {
@@ -70,7 +68,7 @@ async function getCollectionAddDate(collection, callback) {
     var addDate = await collection.findOne({ "date_added": { $exists : true }});
     if(addDate) return addDate['date_added'];
     else return null;
-};
+}
 
 
 module.exports.getArticles = getArticles;

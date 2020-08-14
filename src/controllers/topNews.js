@@ -30,6 +30,9 @@ async function topNews(req, res) {
 		}
 
 		var ret = {};
+		if(req.query.image && req.query.image.toLowerCase() == 'required') {
+			articles = articles.filter(e => e.image != null);
+		}
 		var max = (req.query.max) ? req.query.max : gnewsConfig.default_max;
 		ret.articles = articles.slice(0, max);
 		res.json(ret);

@@ -20,17 +20,12 @@ config.mongodb.searchDB = {
 	"uri": config.mongodb.baseUri + "search",
 	"name": "search",
 };
-config.mongodb.staleDays = 1;
+config.mongodb.staleDays = 2;
 
 config.gnews.token = "9a4d5214b11ae43849fc3980da69141b";
-config.gnews.limit = 30;
+config.gnews.limit = 50;
 config.gnews.default_max = 20;
-config.gnews.default_params = {
-	max: config.gnews.limit,
-	token: config.gnews.token,
-};
-config.gnews.search_params = {
-	image: "required",
+config.gnews.params = {
 	max: config.gnews.limit,
 	token: config.gnews.token,
 };

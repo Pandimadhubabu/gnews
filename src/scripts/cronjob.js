@@ -115,7 +115,6 @@ async function handleSearch() {
 
 			//get keyword
 			keyword = search[key].term.trim().toLowerCase();
-			console.log(keyword);
 			//set collection
 			let collection = db.collection(keyword);
 
@@ -154,11 +153,11 @@ async function handleOperation(term, collection, input) {
 	if(!data.errors) {
 		//add fetch data to mongodb
 		await addArticles(collection, data.articles, true);
-		console.log(`added articles to collection in mongo!`);
+		console.log(`added articles about ${input.type}/${term} to collection in mongo!`);
 
 	} else {
 		console.log("DIDN'T WORK FOR", term);
-		console.log(data);
+		console.log(data.errors);
 	}
 
 	await new Promise(resolve => setTimeout(resolve, 500));
@@ -189,7 +188,7 @@ async function handleStaleSearch(db, set) {
 			if(!data.errors) await addArticles(collection, data.articles, false);
 			else {
 				console.log("DIDN'T WORK FOR", term);
-				console.log(data);
+				console.log(data.errors);
 			}
 		}
 

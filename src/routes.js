@@ -8,10 +8,4 @@ router.get('/topNews', topNews);
 router.get('/topics/:topic', searchTopic);
 router.get('/search', searchNews);
 
-
-// router.get('/querytest', (req, res) => {
-// 	console.log(req.query);
-// 	res.send({ message: 'query test'});
-// });
-
 module.exports = router;
