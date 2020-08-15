@@ -192,6 +192,8 @@ async function handleStaleSearch(db, set) {
 			}
 		}
 
+		console.log();
+
 		await new Promise(resolve => setTimeout(resolve, 500));
 	}
 }
