@@ -13,7 +13,7 @@
 		{ "term": "health" }
 	],
 	"search": [
-			{ "term": "latest"},
+			{ "term": "\"latest\""},
 			{ "term": "recent news" },
 			{ "term": "news"},
 			{ "term": "coronavirus" },
@@ -86,7 +86,8 @@
 			{ "term": "onondaga community college" }, 
 			{ "term": "suny college of optometry" }, 
 			{ "term": "suny orange" }, 
-			{ "term": "suny oswego" }, 
-			{ "term": "suny plattsburgh" } 
+			{ "term": "suny oswego" },
+		{ "term": "suny plattsburgh" },
+		{ "term": "suny " } 
 	]
 }
