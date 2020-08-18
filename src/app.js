@@ -1,4 +1,3 @@
-require('heroku-self-ping').default("https://upwork-gnews-app.herokuapp.com");
 var express = require('express');
 var cron = require('node-cron');
 var schedule = require('node-schedule');
@@ -18,7 +17,7 @@ app.use(helmet());
 
 // Schedule update every hour
 schedule.scheduleJob('0 * * * *', function(){
-	console.log(new Date().toISOString());
+	console.log("STARTING UPDATE AT:", new Date().toTimeString());
 	cronJob();
 });
 

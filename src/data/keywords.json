@@ -22,13 +22,13 @@
 			{ "term": "recent news" },
 			{ "term": "latest news" },
 			{ "term": "daily news" },
-		        { "term": "college news" },
+			{ "term": "college news" },
 			{ "term": "world news" },
 			{ "term": "politics" },
 			{ "term": "religion" },
 			{ "term": "united states" },
-		        { "term": "\"college\"" },
-		        { "term": "\"suny\"" },
+			{ "term": "\"college\"" },
+			{ "term": "\"suny\"" },
 			{ "term": "\"westchester community college\"" },  
 			{ "term": "\"upstate medical university\"" },  
 			{ "term": "\"suny ulster\"" },  
@@ -90,7 +90,7 @@
 			{ "term": "\"suny college of optometry\"" }, 
 			{ "term": "\"suny orange\"" }, 
 			{ "term": "\"suny oswego\"" },
-		        { "term": "\"suny plattsburgh\"" }
+			{ "term": "\"suny plattsburgh\"" }
 		
 	]
 }

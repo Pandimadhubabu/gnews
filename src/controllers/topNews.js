@@ -19,7 +19,7 @@ async function topNews(req, res) {
 
 			var input = { type: "top-news" };
 		    var data = await fetchNews(input);
-		    if(!data.errors) {
+		    if(data && !data.errors) {
 				var writeResult = await addArticles(collection, data.articles, true);
 				console.log("added to mongo!");
 				articles = data.articles;

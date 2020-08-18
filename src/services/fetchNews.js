@@ -24,5 +24,6 @@ module.exports.fetchNews = async function fetchNews(input) {
     .then(result => result.json())
     .then(data => {
     	return data;
-    });
+    })
+    .catch(err => console.log("FETCHING ERROR!!:", err));
 };

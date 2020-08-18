@@ -150,7 +150,7 @@ async function handleOperation(term, collection, input) {
 	//fetch from gnews and update mongodb with new articles
 	var data = await fetchNews(input);
 	//if no errors on fetch call -> eg if request limit not reached
-	if(!data.errors) {
+	if(data && !data.errors) {
 		//add fetch data to mongodb
 		await addArticles(collection, data.articles, true);
 		console.log(`added articles about ${input.type}/${term} to collection in mongo!`);
@@ -181,11 +181,12 @@ async function handleStaleSearch(db, set) {
 			await dropCollection(collection);
 		} else {
 
+			console.log(`${term} is not stale enough yet...`);
+
 			//update with fetch, don't update date_added
 			var input = { type: "search", keyword: term };
 			const data = await fetchNews(input);
-			console.log(`${term} is not stale enough yet...`);
-			if(!data.errors) await addArticles(collection, data.articles, false);
+			if(data && !data.errors) await addArticles(collection, data.articles, false);
 			else {
 				console.log("DIDN'T WORK FOR", term);
 				console.log(data.errors);
