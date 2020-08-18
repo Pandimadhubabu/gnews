@@ -20,10 +20,13 @@ module.exports.fetchNews = async function fetchNews(input) {
  	}
 
     Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
+    
 	return await fetch(url)
     .then(result => result.json())
     .then(data => {
     	return data;
     })
-    .catch(err => console.log("FETCHING ERROR!!:", err));
+    .catch(err => { 
+    	return { errors: err.message }; 
+    });
 };

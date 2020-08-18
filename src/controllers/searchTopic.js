@@ -22,13 +22,13 @@ async function searchTopic(req, res) {
 
 			var input = { type: "topic", topic: topic };
 		    var data = await fetchNews(input);
-		    if(data && !data.errors) {
+		    if(!data.errors) {
 				var writeResult = await addArticles(collection, data.articles, true);
 				console.log("added to mongo!");
 				articles = data.articles;
 			} else {
 				console.log("Errored out");
-				res.json({ message: "Errored out", errors: data.errors });
+				return res.json({ message: "Errored out", errors: data.errors });
 			}
 		}
 
