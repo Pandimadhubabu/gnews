@@ -17,6 +17,7 @@
 			{ "term": "recent news" },
 			{ "term": "news"},
 			{ "term": "coronavirus" },
+		        { "term": "breaking news" },
 			{ "term": "environmental change" },
 			{ "term": "health" },
 			{ "term": "recent news" },
