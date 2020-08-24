@@ -24,6 +24,7 @@
 			{ "term": "latest news" },
 			{ "term": "daily news" },
 			{ "term": "college news" },
+		        { "term": "college" },
 			{ "term": "world news" },
 			{ "term": "politics" },
 			{ "term": "religion" },
