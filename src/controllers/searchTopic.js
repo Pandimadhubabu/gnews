@@ -1,5 +1,5 @@
 var { MongoClient } = require("mongodb");
-var { getArticles, addArticles } = require('../services/mongoBasicOps.js');
+var { getArticles, addArticles } = require('../services/mongoOperations.js');
 var { fetchNews } = require('../services/fetchNews.js');
 var mongoConfig = require('../config.js').mongodb;
 var gnewsConfig = require('../config.js').gnews;
@@ -7,7 +7,7 @@ var gnewsConfig = require('../config.js').gnews;
 async function searchTopic(req, res) {
 	const uri = mongoConfig.topicsDB.uri;
 	const client = new MongoClient(uri, { useUnifiedTopology: true });
-	
+
 	//must lowercase here since using term to access coll in mongo
 	var topic = req.params.topic.toLowerCase();
 

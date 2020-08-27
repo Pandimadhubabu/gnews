@@ -5,7 +5,8 @@ var cors = require('cors');
 var helmet = require('helmet');
 
 const routes = require('./routes.js');
-var { cronJob, handleTopNews } = require('./scripts/cronjob.js');
+var { updateKeywords } = require('./scripts/updateKeywords.js');
+var { updateNonKeywords } = require('./scripts/updateNonKeywords.js');
 
 //mongo setup
 var app = express();
@@ -13,19 +14,20 @@ app.use(cors());
 app.use(helmet());
 
 //invoke update on initialization
-// cronJob();
+// updateKeywords();
 
-// Schedule update every hour
+// Schedule keyword update every hour
 schedule.scheduleJob('0 * * * *', function(){
-	console.log("STARTING UPDATE AT:", new Date().toTimeString());
-	cronJob();
+	console.log("STARTING KEYWORD UPDATE AT:", new Date().toTimeString());
+	updateKeywords();
 });
 
-//stress testing updates on mongodb
-// cron.schedule('*/1 * * * * *', () => {
-// 	handleTopNews();
-//   	console.log('running a task every second');
-// });
+// Schedule non-keyword update every 3 hours at the 30th minute mark
+// At 30 min so it doesn't interfere with keyword update
+schedule.scheduleJob('30 */3 * * *', function() {
+	console.log("STARTING NON-KEYWORD UPDATE AT:", new Date().toTimeString());
+	updateNonKeywords();
+})
 
 app.get('/', (req, res) => res.send('App is working'));
 app.use('/api', routes);
@@ -38,4 +40,3 @@ app.listen(PORT, function() {
 module.exports = {
   app
 };
-

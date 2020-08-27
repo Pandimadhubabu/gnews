@@ -2,12 +2,11 @@ var { MongoClient } = require("mongodb");
 var mongoConfig = require('../config.js').mongodb;
 
 var { fetchNews } = require('../services/fetchNews.js');
-var { addArticles, getAllCollections, dropCollection, getCollectionAddDate } = require('../services/mongoBasicOps.js');
-var { staleISOString } = require('../utilities/timeUtils.js');
+var { addArticles } = require('../services/mongoOperations.js');
 
 var json = require('../data/keywords.json');
 
-async function cronJob() {
+async function updateKeywords() {
 	/****************************TOP NEWS****************************/
 	await handleTopNews();
 
@@ -18,11 +17,11 @@ async function cronJob() {
 	await handleSearch();
 }
 
-module.exports.cronJob = cronJob;
+module.exports.updateKeywords = updateKeywords;
 
 
 async function handleTopNews() {
-	console.log("*****************STARTING TOP NEWS*****************\n");
+	console.log("*****************UPDATING TOP NEWS*****************\n");
 
 	//mongo client setup
 	const uri = mongoConfig.topnewsDB.uri;
@@ -43,7 +42,7 @@ async function handleTopNews() {
 		//pass to handler function for fetching and adding news
 		var input = { type: "top-news" };
 		await handleOperation(collName, collection, input);
-		
+
 	} finally {
 		client.close();
 	}
@@ -56,7 +55,7 @@ module.exports.handleTopNews = handleTopNews;
 
 async function handleTopics() {
 
-	console.log("*****************STARTING TOPICS*****************");
+	console.log("*****************UPDATING TOPICS*****************");
 	//mongo client setup
 	const uri = mongoConfig.topicsDB.uri;
 	const client = new MongoClient(uri, { useUnifiedTopology: true });
@@ -92,10 +91,10 @@ async function handleTopics() {
 
 module.exports.handleTopics = handleTopics;
 
-	
-//get names of all collections in form of set, when iterating through collection, delete from set
+
+//upate all keywords from JSON search field
 async function handleSearch() {
-	console.log("*****************STARTING SEARCH*****************\n");
+	console.log("*****************UPDATING SEARCH*****************\n");
 
 	//mongo client setup
 	const uri = mongoConfig.searchDB.uri;
@@ -104,9 +103,6 @@ async function handleSearch() {
 	try {
 		await client.connect();
 		const db = client.db(mongoConfig.searchDB.name);
-
-		//dbCollectionSet will hold all keywords that exist inside mongo database
-		var dbCollectionSet = await getAllCollections(db);
 
 		// //iterate through list of topics
 		var search = json['search'];
@@ -122,19 +118,9 @@ async function handleSearch() {
 			var input = { type: "search", keyword: keyword };
 			await handleOperation(keyword, collection, input);
 
-		    //if our Search database has a required keywords, remove it
-		    //we'll process leftovers later, where leftovers are non-required keywords
-		    dbCollectionSet.delete(keyword);
-
 	    	console.log("***********");
 	    	console.log('\n');
 		}
-
-		// process non important keywords here
-		// dbCollectionSet now contains all non-keywords that exist inside mongo database
-
-		await handleStaleSearch(db, dbCollectionSet);
-
 	} finally {
 		client.close();
 	}
@@ -153,64 +139,13 @@ async function handleOperation(term, collection, input) {
 	if(!data.errors) {
 		//add fetch data to mongodb
 		await addArticles(collection, data.articles, true);
-		console.log(`added articles about ${input.type}/${term} to collection in mongo!`);
+		console.log(`added articles about ${term} to ${input.type} db in mongo!`);
 
 	} else {
 		console.log("DIDN'T WORK FOR", term);
 		console.log(data.errors);
 	}
 
+	//set timeout so Gnews doesn't block requests
 	await new Promise(resolve => setTimeout(resolve, 500));
 }
-
-//prune stale collections after maybe 7 days??
-async function handleStaleSearch(db, set) {
-	//iterate over set
-	//get collection information,
-	//	-if date-added exceeds 7 days, mark as stale and remove otherwise leave it alone
-
-	for(term of set) {
-		var collection = db.collection(term);
-		var addDateISO = await getCollectionAddDate(collection);
-
-		//check whether collection is stale
-		if(staleISOString(addDateISO, mongoConfig.staleDays)) {
-
-			//drop the collection if stale
-			console.log(`Dropping collection ${term}...`);
-			await dropCollection(collection);
-		} else {
-
-			console.log(`${term} is not stale enough yet...`);
-
-			//update with fetch, don't update date_added
-			var input = { type: "search", keyword: term };
-			const data = await fetchNews(input);
-			if(!data.errors) await addArticles(collection, data.articles, false);
-			else {
-				console.log("DIDN'T WORK FOR", term);
-				console.log(data.errors);
-			}
-		}
-
-		console.log();
-
-		await new Promise(resolve => setTimeout(resolve, 500));
-	}
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

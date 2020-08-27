@@ -2,7 +2,6 @@ var config = {};
 
 config.mongodb = {};
 config.gnews = {};
-config.cron = {};
 
 //mongodb authentication
 config.mongodb.user = "root";
@@ -26,7 +25,7 @@ config.mongodb.searchDB.name = "search";
 config.mongodb.searchDB.uri = config.mongodb.baseUri + config.mongodb.searchDB.name;
 
 
-config.mongodb.staleDays = 2;	//Days non-keywords can be stored in mongo DB before being removed
+config.mongodb.staleDays = 1;	//Days non-keywords can be stored in mongo DB before being removed
 
 
 config.gnews.token = "9a4d5214b11ae43849fc3980da69141b";	//Gnews.io token

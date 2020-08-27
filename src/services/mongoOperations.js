@@ -17,11 +17,11 @@ async function addArticles(collection, entries, updateDate, callback) {
     entries = entries.sort((a, b) => a.publishedAt < b.publishedAt ? 1 : -1);
 
     // Get the collection and bulk api artefacts
-    var bulkUpdateOps = [];    
+    var bulkUpdateOps = [];
 
     //push or update articles
     bulkUpdateOps.push(
-        { updateOne: 
+        { updateOne:
             {
                 "filter": { articles: { $exists: true } },
                 "update": { $set: { articles: entries } },
@@ -34,7 +34,7 @@ async function addArticles(collection, entries, updateDate, callback) {
     //should point to true -> first time inserting, word in keyword.json
     if(updateDate) {
         bulkUpdateOps.push(
-            { updateOne: 
+            { updateOne:
                 {
                     "filter": { date_added: { $exists: true } },
                     "update": { $set: { date_added: new Date(Date.now()).toISOString() } },
@@ -76,18 +76,3 @@ module.exports.addArticles = addArticles;
 module.exports.getAllCollections = getAllCollections;
 module.exports.dropCollection = dropCollection;
 module.exports.getCollectionAddDate = getCollectionAddDate;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

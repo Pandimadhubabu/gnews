@@ -1,5 +1,5 @@
 var { MongoClient } = require("mongodb");
-var { getArticles, addArticles } = require('../services/mongoBasicOps.js');
+var { getArticles, addArticles } = require('../services/mongoOperations.js');
 var { fetchNews } = require('../services/fetchNews.js');
 var mongoConfig = require('../config.js').mongodb;
 var gnewsConfig = require('../config.js').gnews;

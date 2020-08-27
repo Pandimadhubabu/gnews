@@ -1,5 +1,5 @@
 var { MongoClient } = require("mongodb");
-var { getArticles, addArticles } = require('../services/mongoBasicOps.js');
+var { getArticles, addArticles } = require('../services/mongoOperations.js');
 var { fetchNews } = require('../services/fetchNews.js');
 var mongoConfig = require('../config.js').mongodb;
 var gnewsConfig = require('../config.js').gnews;
@@ -10,7 +10,7 @@ async function searchNews(req, res) {
 
 	//must lowercase here since using term to access coll in mongo
 	const keyword = req.query.q.trim().toLowerCase();
-	
+
 	try {
 		await client.connect();
 		const db = client.db(mongoConfig.searchDB.name);
