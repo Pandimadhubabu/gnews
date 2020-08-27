@@ -34,7 +34,7 @@ async function updateNonKeywords() {
 		client.close();
 	}
 
-    console.log("*****************DONE WITH TOP NEWS*****************\n");
+    console.log("*****************DONE WITH NON KEYWORDS*****************\n");
 }
 
 async function handleStaleSearch(db, set) {
