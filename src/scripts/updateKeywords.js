@@ -7,13 +7,13 @@ var { addArticles } = require('../services/mongoOperations.js');
 var json = require('../data/keywords.json');
 
 async function updateKeywords() {
-	/****************************TOP NEWS****************************/
+	//Top news handler
 	await handleTopNews();
 
-	/****************************TOPICS****************************/
+	//Topic handler
 	await handleTopics();
 
-	/****************************SEARCH****************************/
+	//Search handler
 	await handleSearch();
 }
 

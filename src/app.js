@@ -27,7 +27,7 @@ schedule.scheduleJob('0 * * * *', function(){
 schedule.scheduleJob('30 */3 * * *', function() {
 	console.log("STARTING NON-KEYWORD UPDATE AT:", new Date().toTimeString());
 	updateNonKeywords();
-})
+});
 
 app.get('/', (req, res) => res.send('App is working'));
 app.use('/api', routes);
