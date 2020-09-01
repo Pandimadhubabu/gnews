@@ -10,6 +10,7 @@ async function searchNews(req, res) {
 
 	//must lowercase here since using term to access coll in mongo
 	const keyword = req.query.q.trim().toLowerCase();
+	if(!keyword) return res.json({ message: "Error", error: "Empty search parameter"});
 
 	try {
 		await client.connect();

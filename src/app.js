@@ -17,17 +17,17 @@ app.use(helmet());
 // updateKeywords();
 
 // Schedule keyword update every hour
-schedule.scheduleJob('0 * * * *', function(){
-	console.log("STARTING KEYWORD UPDATE AT:", new Date().toTimeString());
-	updateKeywords();
-});
+// schedule.scheduleJob('0 * * * *', function(){
+// 	console.log("STARTING KEYWORD UPDATE AT:", new Date().toTimeString());
+// 	updateKeywords();
+// });
 
-// Schedule non-keyword update every 3 hours at the 30th minute mark
-// At 30 min so it doesn't interfere with keyword update
-schedule.scheduleJob('30 */3 * * *', function() {
-	console.log("STARTING NON-KEYWORD UPDATE AT:", new Date().toTimeString());
-	updateNonKeywords();
-});
+// // Schedule non-keyword update every 3 hours at the 30th minute mark
+// // At 30 min so it doesn't interfere with keyword update
+// schedule.scheduleJob('30 */3 * * *', function() {
+// 	console.log("STARTING NON-KEYWORD UPDATE AT:", new Date().toTimeString());
+// 	updateNonKeywords();
+// });
 
 app.get('/', (req, res) => res.send('App is working'));
 app.use('/api', routes);
